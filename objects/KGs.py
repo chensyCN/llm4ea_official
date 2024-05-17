@@ -305,11 +305,11 @@ class KGs:
                 if prob > threshold:
                     inferred_alignments.add((ent_id, counterpart_id))
         self.refined_alignments = inferred_alignments.intersection(self.annotated_alignments)
-        self._enforce_refined_labels(score=0.9)
+        self._enforce_refined_labels(score=Config.delta_2)
 
     def _enforce_refined_labels(self, score):
         """
-        set the score of the refined alignments to be at least 0.9
+        set the score of the refined alignments to be at least Config.delta_2
         """
         for ent_l_id, ent_r_id in self.refined_alignments:
             self.sub_ent_prob[ent_l_id] = max(self.sub_ent_prob[ent_l_id], score)
@@ -324,7 +324,7 @@ class KGs:
                 if (l, r) in self.annotated_alignments:
                     continue
             else:
-                if self.sub_ent_match[l] and self.sub_ent_prob[l] >= 0.9 and self.sub_ent_match[r] and self.sub_ent_prob[r] >= 0.9:
+                if self.sub_ent_match[l] and self.sub_ent_prob[l] >= Config.delta_2 and self.sub_ent_match[r] and self.sub_ent_prob[r] >= Config.delta_2:
                     continue
             self.sub_ent_match[l], self.sub_ent_prob[l] = r, Config.delta_1
             self.sup_ent_match[r], self.sup_ent_prob[r] = l, Config.delta_1
@@ -596,7 +596,7 @@ class KGsUtil:
         inferred_alignments = set()
         for ent in self.kgs.kg_l.entity_set:
             counterpart, prob = self.__get_counterpart_and_prob(ent)
-            if (filter and (prob < 0.9)) or counterpart is None:
+            if (filter and (prob < Config.delta_2)) or counterpart is None:
                 continue
             inferred_alignments.add((ent.id, counterpart.id))
         refined_alignments = inferred_alignments.intersection(self.kgs.annotated_alignments)
@@ -643,7 +643,7 @@ class KGsUtil:
         train_pair = set()
         for ent in self.kgs.kg_l.entity_set:
             counterpart, prob = self.__get_counterpart_and_prob(ent)
-            if (filter and (prob < 0.9)) or counterpart is None:
+            if (filter and (prob < Config.delta_2)) or counterpart is None:
                 continue
             train_pair.add((ent.id, counterpart.id))
         train_pair = train_pair.intersection(self.kgs.annotated_alignments)
@@ -652,7 +652,7 @@ class KGsUtil:
         if Config.init_with_attr:
             for ent in self.kgs.kg_l.entity_set:
                 counterpart, prob = self.__get_counterpart_and_prob(ent)
-                if prob < 0.9 or counterpart is None:
+                if prob < Config.delta_2 or counterpart is None:
                     continue
                 train_pair.add((ent.id, counterpart.id))
         print(f"Number of overall refined and inferred train pairs: {len(train_pair)}")
