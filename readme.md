@@ -32,9 +32,9 @@ here, the arguement `--tpr` specifies the true positive rate for the synthesized
 
 There are three optional scripts: `infer-baseline.py`, `infer-active-only.py`, and `infer-lr-only.py`, which are variants of the infer.py script.
 
-- The `infer-baseline.py` script deactivates both the label refinement and active learning components of the framework, directly training the base EA model, Dual-AMN. This corresponds to the Dual-AMN setting in the main table.
-- The `infer-active-only.py` script deactivates the label refinement component of the model. This corresponds to the w/o LR ablation setting in the paper.
-- The `infer-lr-only.py` script deactivates the active learning component of the model. This corresponds to the w/o Act ablation setting in the paper.
+- The `infer-baseline.py` script deactivates both the label refinement and active learning components of the framework, directly training the base EA model, Dual-AMN. This corresponds to the Dual-AMN baseline in the main table.
+- The `infer-active-only.py` script deactivates the label refinement component of the model. This corresponds to the `w/o LR` ablation setting in the paper.
+- The `infer-lr-only.py` script deactivates the active learning component of the model. This corresponds to the `w/o Act` ablation setting in the paper.
 
 
 ### Acknowledgement
