@@ -39,7 +39,7 @@ There are three optional scripts: `infer-baseline.py`, `infer-active-only.py`, a
 
 ### Acknowledgement
 
-The code is based on [PRASE](https://github.com/qizhyuan/PRASE-Python) and [Dual-AMN](https://github.com/MaoXinn/Dual-AMN), the dataset is from [OpenEA benchmark](https://github.com/nju-websoft/OpenEA), preprocessed by using the dump file `wikidatawiki-20160801-abstract.xml` from [wikdata](https://archive.org/download/wikidatawiki-20160801).
+The code is based on [PRASE](https://github.com/qizhyuan/PRASE-Python) and [Dual-AMN](https://github.com/MaoXinn/Dual-AMN), the dataset is from [OpenEA benchmark](https://github.com/nju-websoft/OpenEA), preprocessed by using the dump file `wikidatawiki-20160801-abstract.xml` from [wikdata](https://archive.org/download/wikidatawiki-20160801). The OpenEA dataset is licensed under the GPLv3 License.
 
 ### License
 
