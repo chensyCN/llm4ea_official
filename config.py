@@ -1,28 +1,27 @@
 
 class Config(object):
-    # for probabilistic inference
-    init_with_attr = False
-    label_refine = True
-
-    # for inference
-    query_scheme = "aggregated"
-    simulate = False
-    topk = True
-    num_selected_ent = 20
-
-    # for annotation
+    # for data processing
     simplify_url = True
     remove_ID_attr = False
+
+    # for active selection
+    query_scheme = "aggregated"
+
+    # for annotation
+    simulate = False
     gpt_api_key = None # please specify your own GPT API key before running the code
     gpt_model = 'gpt-3.5-turbo'
-    delta_1 = 0.5 # delta_1 in the paper
-    delta_2 = 0.9 # delta_2 in the paper
+
+    # for probabilistic inference
+    init_with_attr = False # enhance the label refinement with identical attributes
+    label_refine = True
+    delta_0 = 0.5 
+    delta_1 = 0.9 
 
     ## print control during exps
     print_during_exp = {
         'paris': False
     }
-
 
     @classmethod
     def __repr__(cls):

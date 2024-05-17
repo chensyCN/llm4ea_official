@@ -242,8 +242,8 @@ class KGs:
                 if ent_r_val in self.topk_match[ent_l_val]:
                     if float(tpr) == 1.0 or inserted_true < inserted_false * tpr / (1 - tpr):
                         self.annotated_alignments.add((ent_l_id, ent_r_id))
-                        self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = ent_r_id, Config.delta_1
-                        self.sup_ent_match[ent_r_id], self.sup_ent_prob[ent_r_id] = ent_l_id, Config.delta_1
+                        self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = ent_r_id, Config.delta_0
+                        self.sup_ent_match[ent_r_id], self.sup_ent_prob[ent_r_id] = ent_l_id, Config.delta_0
                         inserted_true += 1
                     else:
                         replaced_ent_r_val = random.choice(list(self.topk_match[ent_l_val]-{ent_r_val}))
@@ -251,8 +251,8 @@ class KGs:
                             continue
                         replaced_ent_r_id = self.kg_r.entity_dict_by_value[replaced_ent_r_val].id
                         self.annotated_alignments.add((ent_l_id, replaced_ent_r_id))
-                        self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = replaced_ent_r_id, Config.delta_1
-                        self.sup_ent_match[replaced_ent_r_id], self.sup_ent_prob[replaced_ent_r_id] = ent_l_id, Config.delta_1
+                        self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = replaced_ent_r_id, Config.delta_0
+                        self.sup_ent_match[replaced_ent_r_id], self.sup_ent_prob[replaced_ent_r_id] = ent_l_id, Config.delta_0
                         inserted_false += 1
 
         print(f"Number of inserted true entities: {inserted_true} and false entities: {inserted_false}")
@@ -277,8 +277,8 @@ class KGs:
                 continue
             ent_r_id = self.kg_r.entity_dict_by_value[pred].id
             self.annotated_alignments.add((ent_l_id, ent_r_id))
-            self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = ent_r_id, Config.delta_1
-            self.sup_ent_match[ent_r_id], self.sup_ent_prob[ent_r_id] = ent_l_id, Config.delta_1
+            self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = ent_r_id, Config.delta_0
+            self.sup_ent_match[ent_r_id], self.sup_ent_prob[ent_r_id] = ent_l_id, Config.delta_0
 
             if ent_l_id in gold_result_dict_l2r:
                 if ent_r_id == gold_result_dict_l2r[ent_l_id]:
@@ -293,7 +293,7 @@ class KGs:
 # Functions for label refine
 #####################################################################################################
 
-    def refine_labels(self, threshold=Config.delta_1):
+    def refine_labels(self, threshold=Config.delta_0):
         """
         label refinement, by flipping the labels of low confidence alignments
         """
@@ -305,7 +305,7 @@ class KGs:
                 if prob > threshold:
                     inferred_alignments.add((ent_id, counterpart_id))
         self.refined_alignments = inferred_alignments.intersection(self.annotated_alignments)
-        self._enforce_refined_labels(score=Config.delta_2)
+        self._enforce_refined_labels(score=Config.delta_1)
 
     def _enforce_refined_labels(self, score):
         """
@@ -324,10 +324,10 @@ class KGs:
                 if (l, r) in self.annotated_alignments:
                     continue
             else:
-                if self.sub_ent_match[l] and self.sub_ent_prob[l] >= Config.delta_2 and self.sub_ent_match[r] and self.sub_ent_prob[r] >= Config.delta_2:
+                if self.sub_ent_match[l] and self.sub_ent_prob[l] >= Config.delta_1 and self.sub_ent_match[r] and self.sub_ent_prob[r] >= Config.delta_1:
                     continue
-            self.sub_ent_match[l], self.sub_ent_prob[l] = r, Config.delta_1
-            self.sup_ent_match[r], self.sup_ent_prob[r] = l, Config.delta_1
+            self.sub_ent_match[l], self.sub_ent_prob[l] = r, Config.delta_0
+            self.sup_ent_match[r], self.sup_ent_prob[r] = l, Config.delta_0
             injected_pair += 1
             if filter:
                 continue
@@ -596,7 +596,7 @@ class KGsUtil:
         inferred_alignments = set()
         for ent in self.kgs.kg_l.entity_set:
             counterpart, prob = self.__get_counterpart_and_prob(ent)
-            if (filter and (prob < Config.delta_2)) or counterpart is None:
+            if (filter and (prob < Config.delta_1)) or counterpart is None:
                 continue
             inferred_alignments.add((ent.id, counterpart.id))
         refined_alignments = inferred_alignments.intersection(self.kgs.annotated_alignments)
@@ -643,7 +643,7 @@ class KGsUtil:
         train_pair = set()
         for ent in self.kgs.kg_l.entity_set:
             counterpart, prob = self.__get_counterpart_and_prob(ent)
-            if (filter and (prob < Config.delta_2)) or counterpart is None:
+            if (filter and (prob < Config.delta_1)) or counterpart is None:
                 continue
             train_pair.add((ent.id, counterpart.id))
         train_pair = train_pair.intersection(self.kgs.annotated_alignments)
@@ -652,7 +652,7 @@ class KGsUtil:
         if Config.init_with_attr:
             for ent in self.kgs.kg_l.entity_set:
                 counterpart, prob = self.__get_counterpart_and_prob(ent)
-                if prob < Config.delta_2 or counterpart is None:
+                if prob < Config.delta_1 or counterpart is None:
                     continue
                 train_pair.add((ent.id, counterpart.id))
         print(f"Number of overall refined and inferred train pairs: {len(train_pair)}")
