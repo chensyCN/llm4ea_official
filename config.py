@@ -15,7 +15,8 @@ class Config(object):
     remove_ID_attr = False
     gpt_api_key = None # please specify your own GPT API key before running the code
     gpt_model = 'gpt-3.5-turbo'
-    initial_alignment_score = 0.5 # delta_1 in the paper
+    delta_1 = 0.5 # delta_1 in the paper
+    delta_2 = 0.9 # delta_2 in the paper
 
     ## print control during exps
     print_during_exp = {

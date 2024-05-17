@@ -197,7 +197,7 @@ class KGs:
 # Functions for annotation
 #===================================================================================================
 
-    def generate_labels(self, budget, tpr=0.5):
+    def generate_labels(self, budget, tpr=0.8):
         not_matched_kg_l_ent_id = set()
         not_confident_kg_l_ent_id = set()
 
@@ -222,7 +222,7 @@ class KGs:
         else:
             self.__annotate(selected_ent_ids)
 
-    def __simulate_annotate(self, selected_ent_ids, tpr=0.5):
+    def __simulate_annotate(self, selected_ent_ids, tpr=0.8):
         inserted_true = 0
         inserted_false = 0
 
@@ -242,8 +242,8 @@ class KGs:
                 if ent_r_val in self.topk_match[ent_l_val]:
                     if float(tpr) == 1.0 or inserted_true < inserted_false * tpr / (1 - tpr):
                         self.annotated_alignments.add((ent_l_id, ent_r_id))
-                        self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = ent_r_id, 0.5
-                        self.sup_ent_match[ent_r_id], self.sup_ent_prob[ent_r_id] = ent_l_id, 0.5
+                        self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = ent_r_id, Config.delta_1
+                        self.sup_ent_match[ent_r_id], self.sup_ent_prob[ent_r_id] = ent_l_id, Config.delta_1
                         inserted_true += 1
                     else:
                         replaced_ent_r_val = random.choice(list(self.topk_match[ent_l_val]-{ent_r_val}))
@@ -251,8 +251,8 @@ class KGs:
                             continue
                         replaced_ent_r_id = self.kg_r.entity_dict_by_value[replaced_ent_r_val].id
                         self.annotated_alignments.add((ent_l_id, replaced_ent_r_id))
-                        self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = replaced_ent_r_id, 0.5
-                        self.sup_ent_match[replaced_ent_r_id], self.sup_ent_prob[replaced_ent_r_id] = ent_l_id, 0.5
+                        self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = replaced_ent_r_id, Config.delta_1
+                        self.sup_ent_match[replaced_ent_r_id], self.sup_ent_prob[replaced_ent_r_id] = ent_l_id, Config.delta_1
                         inserted_false += 1
 
         print(f"Number of inserted true entities: {inserted_true} and false entities: {inserted_false}")
@@ -277,8 +277,8 @@ class KGs:
                 continue
             ent_r_id = self.kg_r.entity_dict_by_value[pred].id
             self.annotated_alignments.add((ent_l_id, ent_r_id))
-            self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = ent_r_id, 0.5
-            self.sup_ent_match[ent_r_id], self.sup_ent_prob[ent_r_id] = ent_l_id, 0.5
+            self.sub_ent_match[ent_l_id], self.sub_ent_prob[ent_l_id] = ent_r_id, Config.delta_1
+            self.sup_ent_match[ent_r_id], self.sup_ent_prob[ent_r_id] = ent_l_id, Config.delta_1
 
             if ent_l_id in gold_result_dict_l2r:
                 if ent_r_id == gold_result_dict_l2r[ent_l_id]:
@@ -293,7 +293,7 @@ class KGs:
 # Functions for label refine
 #####################################################################################################
 
-    def refine_labels(self, threshold=Config.initial_alignment_score):
+    def refine_labels(self, threshold=Config.delta_1):
         """
         label refinement, by flipping the labels of low confidence alignments
         """
@@ -315,9 +315,6 @@ class KGs:
             self.sub_ent_prob[ent_l_id] = max(self.sub_ent_prob[ent_l_id], score)
             self.sup_ent_prob[ent_r_id] = max(self.sup_ent_prob[ent_r_id], score)
 
-    def update_annotations(self):
-        self.annotated_alignments = self.refined_alignments
-
     def inject_ea_inferred_pairs(self, pairs, ent_bias, filter=False, reinject=False):
         injected_pair = 0
         for (l, r) in pairs:
@@ -329,8 +326,8 @@ class KGs:
             else:
                 if self.sub_ent_match[l] and self.sub_ent_prob[l] >= 0.9 and self.sub_ent_match[r] and self.sub_ent_prob[r] >= 0.9:
                     continue
-            self.sub_ent_match[l], self.sub_ent_prob[l] = r, 0.5
-            self.sup_ent_match[r], self.sup_ent_prob[r] = l, 0.5
+            self.sub_ent_match[l], self.sub_ent_prob[l] = r, Config.delta_1
+            self.sup_ent_match[r], self.sup_ent_prob[r] = l, Config.delta_1
             injected_pair += 1
             if filter:
                 continue
@@ -340,30 +337,6 @@ class KGs:
             print(f"Injected {injected_pair} pairs out of {len(pairs)} pairs, but not include in the annotated alignments")
         else:
             print(f"Injected {injected_pair} pairs out of {len(pairs)} pairs")
-
-    def reset_annotation_prob(self, prob=0.5):
-
-        kg_l_ent_num = len(self.kg_l.entity_set) + len(self.kg_l.literal_set)
-        kg_r_ent_num = len(self.kg_r.entity_set) + len(self.kg_r.literal_set)
-        self.sub_ent_match = [None for _ in range(kg_l_ent_num)]
-        self.sub_ent_prob = [0.0 for _ in range(kg_l_ent_num)]
-        self.sup_ent_match = [None for _ in range(kg_r_ent_num)]
-        self.sup_ent_prob = [0.0 for _ in range(kg_r_ent_num)]
-
-        if Config.init_with_attr:
-            num_match_attr = 0
-            for lite_l in self.kg_l.literal_set:
-                if self.kg_r.literal_dict_by_value.__contains__(lite_l.value):
-                    lite_r = self.kg_r.literal_dict_by_value[lite_l.value]
-                    l_id, r_id = lite_l.id, lite_r.id
-                    self.sub_ent_match[l_id], self.sup_ent_match[r_id] = lite_r.id, lite_l.id
-                    self.sub_ent_prob[l_id], self.sup_ent_prob[r_id] = 1.0, 1.0
-                    num_match_attr += 1
-
-        # reset the probability of annotated pairs
-        for (l, r) in self.annotated_alignments:
-            self.sub_ent_match[l], self.sub_ent_prob[l] = r, prob
-            self.sup_ent_match[r], self.sup_ent_prob[r] = l, prob
 
     def set_fusion_func(self, func):
         self.fusion_func = func
@@ -476,14 +449,6 @@ class KGs:
 
         self.__update_rel_align_dict(rel_align_dict, rel_ongoing_dict, rel_norm_dict)
 
-    @staticmethod
-    def update_ent_embeds(kg, new_ent_emb_dict, alpha=0.5):
-        def update_function(emb_origin, emb_new):
-            emb_pool = alpha * emb_origin + (1.0 - alpha) * emb_new
-            return emb_pool / np.linalg.norm(emb_pool)
-
-        for (idx, emb) in new_ent_emb_dict.items():
-            kg.set_ent_embedding(idx, emb, update_function)
 
     @staticmethod
     def __generate_list(kg: KG):
