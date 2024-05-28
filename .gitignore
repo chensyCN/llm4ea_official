@@ -1,0 +1,31 @@
+
+# .gitignore
+
+# Byte compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python artifacts
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Pytest
+.cache
+.pytest_cache
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
+.env
+
+# OS generated files
+.DS_Store 
+Thumbs.db
+
+# VS Code upload settings
+.vscode-upload.json

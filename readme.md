@@ -1,4 +1,4 @@
-# Code implementation for LLM4EA in NeurIPS-2024 submission
+# Code implementation for LLM4EA
 
 ### Quick Start
 
@@ -8,19 +8,17 @@
 pip install -r requirements.txt
 ```
 
-**Step2.** Download the dataset from [here](https://anonymous.4open.science/r/processedOpenEAData-3674/) and put it in the `data` folder.
-
 **Step2.** Specify the `gpt-api-key` in the `config.py` file with your openai API key.
 
-**Step3.** Run the following command to run llm4ea on D-Y-15k dataset
+**Step3.** Execute the following command to run llm4ea on D-Y-15k dataset
 
 ```
 python infer.py --dataset_name D-Y-15K
 ```
 
-### Simulations
+### Simulation
 
-If you have no access to an OpenAI API, you can run the simulation by running the following command:
+If you have no access to an OpenAI API, you can run the simulation by running the following command, it syntheises pseudo-labels for the dataset using the true positive rate of 0.5.
 
 ```
 python infer.py --dataset_name D-Y-15K --simulate --tpr 0.5
@@ -35,6 +33,7 @@ There are three optional scripts: `infer-baseline.py`, `infer-active-only.py`, a
 - The `infer-baseline.py` script deactivates both the label refinement and active learning components of the framework, directly training the base EA model, Dual-AMN. This corresponds to the Dual-AMN baseline in the main table.
 - The `infer-active-only.py` script deactivates the label refinement component of the model. This corresponds to the `w/o LR` ablation setting in the paper.
 - The `infer-lr-only.py` script deactivates the active learning component of the model. This corresponds to the `w/o Act` ablation setting in the paper.
+
 
 
 ### Acknowledgement
