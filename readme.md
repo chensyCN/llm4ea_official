@@ -1,11 +1,11 @@
 ## Table of Content
 
-- [Quick Start](##Quick Start)
+- [Quick Start](#quick-start)
 
-- [Simulation](##Simulation)
-- [Ablation settings](##Ablation settings)
-- [Acknowledgement](##Acknowledgement)
-- [License](##License)
+- [Simulation](#simulation)
+- [Ablation settings](#ablation-settings)
+- [Acknowledgement](#acknowledgement)
+- [License](#license)
 
 ## Quick Start
 
