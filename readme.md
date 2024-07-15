@@ -1,6 +1,8 @@
-# Code implementation for LLM4EA
+## Table of Content
 
-### Quick Start
+[toc]
+
+## Quick Start
 
 **Step1.** Instanll the required packages by running the following command:
 
@@ -16,7 +18,7 @@ pip install -r requirements.txt
 python infer.py --dataset_name D-Y-15K
 ```
 
-### Simulation
+## Simulation
 
 If you have no access to an OpenAI API, you can run the simulation by running the following command, it syntheises pseudo-labels for the dataset using the true positive rate of 0.5.
 
@@ -26,7 +28,7 @@ python infer.py --dataset_name D-Y-15K --simulate --tpr 0.5
 
 here, the arguement `--tpr` specifies the true positive rate for the synthesized pseudo-labels.
 
-### Ablation settings
+## Ablation settings
 
 There are three optional scripts: `infer-baseline.py`, `infer-active-only.py`, and `infer-lr-only.py`, which are variants of the infer.py script.
 
@@ -36,10 +38,18 @@ There are three optional scripts: `infer-baseline.py`, `infer-active-only.py`, a
 
 
 
-### Acknowledgement
+## Acknowledgement
 
 The code is based on [PRASE](https://github.com/qizhyuan/PRASE-Python) and [Dual-AMN](https://github.com/MaoXinn/Dual-AMN), the dataset is from [OpenEA benchmark](https://github.com/nju-websoft/OpenEA), preprocessed by using the dump file `wikidatawiki-20160801-abstract.xml` from [wikdata](https://archive.org/download/wikidatawiki-20160801). The OpenEA dataset is licensed under the GPLv3 License.
 
-### License
+
+
+## Cite
+
+
+
+
+
+## License
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE.txt) file for details.
