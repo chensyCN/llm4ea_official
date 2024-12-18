@@ -1,4 +1,28 @@
-# Code implementation for LLM4EA in NeurIPS-2024
+<h1 align="center">
+Official Code of NeurIPS2024 paper
+  
+[Entity Alignment with Noisy Annotations from Large Language Models](https://arxiv.org/abs/2405.16806)
+
+---
+
+   <p align="center"><img width="95%" src="llm4ea.png" /></p>
+   <p align="center"><em>The framework of LLM4EA.</em></p>
+
+
+
+
+## Table of Content
+
+- [Environment setup](#Environment-setup)
+- [Quick start](#Quick start)
+- [Ablations](#Ablations)
+- [Simulations](#Simulations)
+- [Customization](#Customization)
+- [Acknowledgement](#acknowledgement)
+- [License](#license)
+
+
+
 
 ### Environment setup
 
