@@ -14,7 +14,7 @@ Official Code of NeurIPS2024 paper
 ## Table of Content
 
 - [Environment setup](#Environment-setup)
-- [Quick start](#Quick start)
+- [Quick start](#Quick-start)
 - [Ablations](#Ablations)
 - [Simulations](#Simulations)
 - [Customization](#Customization)
