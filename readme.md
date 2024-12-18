@@ -1,4 +1,4 @@
-# Code implementation for LLM4EA in NeurIPS-2024 submission
+# Code implementation for LLM4EA in NeurIPS-2024
 
 ### Environment setup
 
