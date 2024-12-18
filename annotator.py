@@ -37,36 +37,7 @@ class Annotator:
         response_content = response['choices'][0]['message']['content']
         return response_content
 
-    def train(self, x1: str, y: str):
-        self.messages.append({"role": "user", "content": f"'{x1}' is ture or false?"})
-        response_content = self.ask_chat_gpt()
-        self.messages.append({"role": "assistant", "content": response_content})
-
-        if 'True.' in response_content:
-            if 'True.' == y:
-                feedback = "Good job!"
-            else:
-                feedback = f"You answered incorrectly. You answered '{response_content}', but the correct answer is '{y}'."
-        elif 'False.' in response_content:
-            if 'False.' == y:
-                feedback = "Good job!"
-            else:
-                feedback = f"You answered incorrectly. You answered '{response_content}', but the correct answer is '{y}'."
-        elif 'Not sure.' in response_content:
-            if 'Not sure.' == y:
-                feedback = "Good job!"
-            else:
-                feedback = f"You answered incorrectly. You answered '{response_content}', but the correct answer is '{y}'."
-        else:
-            feedback = "You're answering in the wrong format. If the information described by this entity pair is correct, please reply with 'True'. If not, please reply with 'False' and the corresponding judgment basis. If you are unsure, please reply with 'not sure'. Do not reply with any extra words or punctuation."
-        self.messages.append({"role": "user", "content": feedback})
-
-        print(f"\nCurrent training sample: x1={x1}, y={y}")
-        print(f"self.messages=")
-        for msg in self.messages:
-            print(msg)
-
-    def predict(self, x1, x2):
+    def choose(self, x1, x2):
         self.messages.append({"role": "user", "content": f"Given an entity '{x1}' in the English knowledge graph, please help me determine which of the following entities in '{x2}' corresponds to '{x1}' in the German knowledge graph. Please directly reply with the name of the target entity. Do not reply with any extra words or punctuation."})
         response_content = self.ask_chat_gpt()
         self.messages.pop()

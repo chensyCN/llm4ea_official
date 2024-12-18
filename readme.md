@@ -1,6 +1,6 @@
 # Code implementation for LLM4EA in NeurIPS-2024 submission
 
-### Quick Start
+### Environment setup
 
 **Step1.** Instanll the required packages by running the following command:
 
@@ -10,13 +10,33 @@ pip install -r requirements.txt
 
 **Step2.** Download the dataset from [here](https://anonymous.4open.science/r/processedOpenEAData-3674/) and put it in the `data` folder.
 
-**Step2.** Specify the `gpt-api-key` in the `config.py` file with your openai API key.
+**Step3.** Specify the `gpt-api-key` in the `config.py` file with your openai API key.
 
-**Step3.** Run the following command to run llm4ea on D-Y-15k dataset
+
+### Quick start
+
+**LLM4EA**: Run the following command to run llm4ea on D-W-15k dataset
 
 ```
-python infer.py --dataset_name D-Y-15K
+python infer.py --dataset_name D-W-15K
 ```
+
+**Baseline**: Run the following command to run dual-amn on D-W-15K dataset
+
+```
+python infer-baseline.py --dataset_name D-W-15K
+```
+
+> Note: to facilatate reproducibility, we provide the annotated pseudo-labels generated during experiments, this `quick start` by default load the saved pseudo-labels. To run the actual experiment, please specify the argment  `--load_chk False` in the command.
+
+### Ablations
+
+There are three optional scripts: `infer-baseline.py`, `infer-active-only.py`, and `infer-lr-only.py`, which are variants of the infer.py script.
+
+- The `infer-baseline.py` script deactivates both the label refinement and active learning components of the framework, directly training the base EA model, Dual-AMN. This corresponds to the Dual-AMN baseline in the main table.
+- The `infer-active-only.py` script deactivates the label refinement component of the model. This corresponds to the `w/o LR` ablation setting in the paper.
+- The `infer-lr-only.py` script deactivates the active learning component of the model. This corresponds to the `w/o Act` ablation setting in the paper.
+
 
 ### Simulations
 
@@ -28,13 +48,10 @@ python infer.py --dataset_name D-Y-15K --simulate --tpr 0.5
 
 here, the arguement `--tpr` specifies the true positive rate for the synthesized pseudo-labels.
 
-### Ablation settings
 
-There are three optional scripts: `infer-baseline.py`, `infer-active-only.py`, and `infer-lr-only.py`, which are variants of the infer.py script.
+### Customization
 
-- The `infer-baseline.py` script deactivates both the label refinement and active learning components of the framework, directly training the base EA model, Dual-AMN. This corresponds to the Dual-AMN baseline in the main table.
-- The `infer-active-only.py` script deactivates the label refinement component of the model. This corresponds to the `w/o LR` ablation setting in the paper.
-- The `infer-lr-only.py` script deactivates the active learning component of the model. This corresponds to the `w/o Act` ablation setting in the paper.
+You may customize this framework to your dataset/task by revising the prompts. For instance, some dataset may not contain the entity names and rely on entity attributes to perform alignment, you may customize the `self.messages` and the `self.choose` function in `annotator.py->Annotator`.
 
 
 ### Acknowledgement

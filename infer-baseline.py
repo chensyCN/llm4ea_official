@@ -14,9 +14,10 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('--bottomk', action='store_true')
 argparser.add_argument('--topk_match', type=int, default=10)
 argparser.add_argument('--query_scheme', type=str, default="aggregated")
-argparser.add_argument('--dataset', type=str, default="D_W_15K")
+argparser.add_argument('--dataset', type=str, default="EN_DE_15K")
 argparser.add_argument('--iter', type=int, default=3)
 argparser.add_argument('--tpr', type=float, default=0.95)
+argparser.add_argument('--load_chk', type=str, default=True, help="load the previously saved PRASE model, by default True")
 argparser.add_argument('--simulate', action='store_true', help="simulate the label annotation process, used only in case studies or have no access to llm api, by default False")
 argparser.add_argument('--budget', type=float, default=0.1, help="ratio of the number of inserted pairs to the number of entities in KG1")
 args = argparser.parse_args()
@@ -25,6 +26,14 @@ Config.init_with_attr = False
 print(f"init_with_attr: {Config.init_with_attr}")
 Config.query_scheme = args.query_scheme
 Config.simulate = args.simulate
+
+print(f"\nExp config:\n {Config()}\n")
+
+base, _ = os.path.split(os.path.abspath(__file__))
+dataset_name = args.dataset
+dataset_path = os.path.join(os.path.join(base, "data"), dataset_name)
+topk_match_path = os.path.join(dataset_path, f"top{args.topk_match}_match.dict")
+
 
 def construct_kg(path_r, path_a=None, sep='\t', name=None):
     kg = KG(name=name)
@@ -102,31 +111,27 @@ def construct_kgs(dataset_dir, name="KGs", load_chk=None):
     return kgs
 
 
-def align(kgs):
+def align(kgs, label_path=None):
 
     tpr = args.tpr
     pairNum = int(len(kgs.kg_l.entity_set) * args.budget)
 
-    kgs.generate_labels(budget=pairNum, tpr=tpr)
+
+    if label_path is not None:
+        kgs.load_labels(label_path)
+    else:
+        kgs.generate_labels(budget=pairNum, tpr=tpr)
 
     # use refined labels to train EA model
     data, bias = kgs.util.generate_input_for_emb_model_active_only()
     print(f"bias: {bias}")
 
     ea_model = EntityAlignmentModel(data)
-    _ = ea_model.train(epoch=20)
-
-
+    _ = ea_model.fine_tune(epoch=20)
 
 
 if __name__ == '__main__':
 
-    print(f"\nExp config:\n {Config()}\n")
-
-    base, _ = os.path.split(os.path.abspath(__file__))
-    dataset_name = args.dataset
-    dataset_path = os.path.join(os.path.join(base, "data"), dataset_name)
-    topk_match_path = os.path.join(dataset_path, f"top{args.topk_match}_match.dict")
 
     print("Construct KGs...")
     kgs = construct_kgs(dataset_dir=dataset_path, name=dataset_name, load_chk=None)
@@ -137,4 +142,5 @@ if __name__ == '__main__':
     
     kgs.set_iteration(20)
 
-    align(kgs=kgs)
+    label_path = dataset_path + "/pseudo-labels" if args.load_chk else None
+    align(kgs=kgs, label_path=label_path)

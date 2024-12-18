@@ -102,6 +102,30 @@ class KGs:
             self.sup_ent_match[l_id], self.sup_ent_prob[l_id] = r_id, prob
         return True
 
+    def reset_annotation_prob(self, prob=0.5):
+
+        kg_l_ent_num = len(self.kg_l.entity_set) + len(self.kg_l.literal_set)
+        kg_r_ent_num = len(self.kg_r.entity_set) + len(self.kg_r.literal_set)
+        self.sub_ent_match = [None for _ in range(kg_l_ent_num)]
+        self.sub_ent_prob = [0.0 for _ in range(kg_l_ent_num)]
+        self.sup_ent_match = [None for _ in range(kg_r_ent_num)]
+        self.sup_ent_prob = [0.0 for _ in range(kg_r_ent_num)]
+
+        if Config.init_with_attr:
+            num_match_attr = 0
+            for lite_l in self.kg_l.literal_set:
+                if self.kg_r.literal_dict_by_value.__contains__(lite_l.value):
+                    lite_r = self.kg_r.literal_dict_by_value[lite_l.value]
+                    l_id, r_id = lite_l.id, lite_r.id
+                    self.sub_ent_match[l_id], self.sup_ent_match[r_id] = lite_r.id, lite_l.id
+                    self.sub_ent_prob[l_id], self.sup_ent_prob[r_id] = 1.0, 1.0
+                    num_match_attr += 1
+
+        # reset the probability of annotated pairs
+        for (l, r) in self.annotated_alignments:
+            self.sub_ent_match[l], self.sub_ent_prob[l] = r, prob
+            self.sup_ent_match[r], self.sup_ent_prob[r] = l, prob
+
 #===================================================================================================
 # Functions for active seletion of source entities
 #===================================================================================================
@@ -271,7 +295,7 @@ class KGs:
             ent_l_val = self.kg_l.entity_dict_by_id[ent_l_id].value
             candidates = set(entity for (entity, _, _) in self.topk_match[ent_l_val])
             candidates_str = str(candidates)
-            pred = self.annotator.predict(ent_l_val, candidates_str)
+            pred = self.annotator.choose(ent_l_val, candidates_str)
             if pred not in candidates or pred not in self.kg_r.entity_dict_by_value: # check the validity of the predicted entity
                 print(f"Error: the predicted entity {pred} is not in the candidates")
                 continue
@@ -287,6 +311,32 @@ class KGs:
                     inserted_false += 1
         
         print(f"Number of inserted true entities: {inserted_true} and false entities: {inserted_false}")
+
+    def save_labels(self, path):
+        # this function save the annotated alignments to a file under the dataset directory
+        with open(path, "w", encoding="utf8") as f:
+            for (l, r) in self.annotated_alignments:
+                f.write(f"{self.kg_l.ent_lite_list_by_id[l].value}\t{self.kg_r.ent_lite_list_by_id[r].value}\n")
+
+    def load_labels(self, path):
+        # this function load the annotated alignments from a file under the dataset directory
+        with open(path, "r", encoding="utf8") as f:
+            for line in f.readlines():
+                params = str.strip(line).split("\t")
+                # pdb.set_trace()
+                ent_l, ent_r = params[0].strip(), params[1].strip()
+                obj_l, obj_r = self.kg_l.entity_dict_by_value.get(ent_l), self.kg_r.entity_dict_by_value.get(ent_r)
+                if obj_l is None:
+                    print("Exception: fail to load Entity (" + ent_l + ")")
+                if obj_r is None:
+                    print("Exception: fail to load Entity (" + ent_r + ")")
+                if obj_l is None or obj_r is None:
+                    continue
+                self.annotated_alignments.add((obj_l.id, obj_r.id))
+                self.sub_ent_match[obj_l.id], self.sub_ent_prob[obj_l.id] = obj_r.id, Config.delta_0
+                self.sup_ent_match[obj_r.id], self.sup_ent_prob[obj_r.id] = obj_l.id, Config.delta_0
+        
+        print(f"\n Loaded {len(self.annotated_alignments)} annotated alignments from {path}")
 
 
 #####################################################################################################
@@ -360,7 +410,7 @@ class KGs:
 
     def run(self):
         start_time = time.time()
-        print("Label refine ...... ")
+        print("Label refine  ...... ")
         # print("Initial alignment......")
         self.util.test(gold_result=self.gold_result, threshold=[0.1 * i for i in range(10)])
         for i in range(self.iteration):
@@ -604,8 +654,8 @@ class KGsUtil:
         recalled_true = refined_alignments.intersection(self.kgs.gold_result)
         recall = len(recalled_true) / len(annotated_true)
         precision = 0 if len(refined_alignments) == 0 else len(recalled_true) / len(refined_alignments)
-        print(f"recall of annotated true pairs (not yet ready): {len(recalled_true)}/{len(annotated_true)}={recall}")
-        print(f"precision of annotated true pairs (not yet ready): {len(recalled_true)}/{len(refined_alignments)}={precision}")
+        print(f"recall of annotated true pairs (not yet ready): {len(recalled_true)}/{len(annotated_true)}={recall:.4f}")
+        print(f"precision of annotated true pairs (not yet ready): {len(recalled_true)}/{len(refined_alignments)}={precision:.4f}")
         
     def print_metrics(self, gold_result, predictions):
         correct_num = len(gold_result & predictions)
@@ -622,12 +672,12 @@ class KGsUtil:
             precision, recall = correct_num / predict_num, correct_num / total_num
             recall = recall + 0.02
             if precision <= 0.0 or recall <= 0.0:
-                print("Precision: " + format(precision, ".6f") +
-                      "\tRecall: " + format(recall, ".6f") + "\tF1-Score: Nan")
+                print("Precision: " + format(precision, ".4f") +
+                      "\tRecall: " + format(recall, ".4f") + "\tF1-Score: Nan")
             else:
                 f1_score = 2.0 * precision * recall / (precision + recall)
-                print("Precision: " + format(precision, ".6f") +
-                      "\tRecall: " + format(recall, ".6f") + "\tF1-Score: " + format(f1_score, ".6f"))
+                print("Precision: " + format(precision, ".4f") +
+                      "\tRecall: " + format(recall, ".4f") + "\tF1-Score: " + format(f1_score, ".4f"))
 
     def generate_input_for_emb_model(self, filter=False):
 
@@ -660,8 +710,10 @@ class KGsUtil:
         # the recall of annotated true pairs
         annotated_true = self.kgs.annotated_alignments.intersection(self.kgs.gold_result)
         recalled_true = train_pair.intersection(self.kgs.gold_result)
-        print(f"recall of annotated true pairs: {len(recalled_true)}/{len(annotated_true)}")
-        print(f"precision of annotated true pairs: {len(recalled_true)}/{len(train_pair)}")
+        recall = len(recalled_true) / len(annotated_true)
+        precision = len(recalled_true) / len(train_pair)
+        print(f"recall of annotated true pairs: {len(recalled_true)}/{len(annotated_true)}={recall:.4f}")
+        print(f"precision of annotated true pairs: {len(recalled_true)}/{len(train_pair)}={precision:.4f}")
         dev_pair = self.kgs.gold_result
 
         # make sure that the entity/relation id in the two KGs have no intersection by adding a bias value
@@ -700,7 +752,8 @@ class KGsUtil:
         triples2 = [(h + ent_bias, r + rel_bias, t + ent_bias) for (h, r, t) in triples2]
         train_pair = [(l, r+ent_bias) for (l, r) in train_pair]
         dev_pair = [(l, r+ent_bias) for (l, r) in dev_pair]
-        print(f"precision of annotated true pairs: {len(set(train_pair).intersection(set(dev_pair)))}/{len(train_pair)}")
+        precision = len(set(train_pair).intersection(set(dev_pair))) / len(train_pair)
+        print(f"precision of annotated true pairs: {len(set(train_pair).intersection(set(dev_pair)))}/{len(train_pair)}={precision:.4f}")
 
         return (entity1, rel1, triples1, entity2, rel2, triples2, train_pair, dev_pair), (ent_bias, rel_bias)
 

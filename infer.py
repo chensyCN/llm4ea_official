@@ -13,9 +13,10 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('--bottomk', action='store_true')
 argparser.add_argument('--topk_match', type=int, default=10)
 argparser.add_argument('--query_scheme', type=str, default="aggregated", help="the scheme of active selection, by default aggregated")
-argparser.add_argument('--dataset', type=str, default="D_Y_15K")
-argparser.add_argument('--iter', type=int, default=3)
-argparser.add_argument('--tpr', type=float, default=0.95)
+argparser.add_argument('--dataset', type=str, default="EN_DE_15K")
+argparser.add_argument('--iter', type=int, default=1)
+argparser.add_argument('--tpr', type=float, default=0.5)
+argparser.add_argument('--load_chk', type=str, default=True, help="load the previously saved PRASE model, by default None")
 argparser.add_argument('--simulate', action='store_true', help="simulate the label annotation process, used only in case studies or have no access to llm api, by default False")
 argparser.add_argument('--budget', type=float, default=0.1, help="ratio of the number of inserted pairs to the number of entities in KG1")
 args = argparser.parse_args()
@@ -24,6 +25,14 @@ Config.init_with_attr = False
 print(f"init_with_attr: {Config.init_with_attr}")
 Config.query_scheme = args.query_scheme
 Config.simulate = args.simulate
+
+
+print(f"\nExp config:\n {Config()}\n")
+base, _ = os.path.split(os.path.abspath(__file__))
+dataset_name = args.dataset
+dataset_path = os.path.join(os.path.join(base, "data"), dataset_name)
+topk_match_path = os.path.join(dataset_path, f"top{args.topk_match}_match.dict")
+
 
 def construct_kg(path_r, path_a=None, sep='\t', name=None):
     kg = KG(name=name)
@@ -101,38 +110,43 @@ def construct_kgs(dataset_dir, name="KGs", load_chk=None):
     return kgs
 
 
-def align(kgs):
+def align(kgs, label_path=None):
 
     iter = args.iter
     tpr = args.tpr
     pairBudget = int(len(kgs.kg_l.entity_set) * args.budget)
     pairPerIter = pairBudget // iter
 
-    # active selection process
-    for i in range(iter):
-        print(f"Inserting {pairPerIter} pairs in iteration {i}...")
-        kgs.generate_labels(budget=pairPerIter, tpr=tpr)
-        # label refine
-        kgs.set_iteration(20)
-        kgs.run()
-        # evaluate the quality of refined labels
-        kgs.util.test_refined_alignments()
+    if label_path is not None:
+        kgs.load_labels(label_path)
+    else:
+        # active selection process
+        for i in range(iter):
+            print(f"Inserting {pairPerIter} pairs in iteration {i}...")
+            kgs.generate_labels(budget=pairPerIter, tpr=tpr)
+            # label refine
+            kgs.set_iteration(2)
+            kgs.run()
+            # evaluate the quality of refined labels
+            kgs.util.test_refined_alignments()
 
-        # use refined labels to train EA model
-        data, bias = kgs.util.generate_input_for_emb_model()
-        print(f"bias: {bias}")
-        if i == 0:
-            ea_model = EntityAlignmentModel(data)
-        else:
-            train_pair= data[-2]
-            ea_model.reset_data(train_pair)
-        new_pairs = ea_model.train(epoch=20)
-        
-        # feed the inferred pairs into label refiner, for the next iteration
-        kgs.inject_ea_inferred_pairs(new_pairs, bias[0], filter=True, reinject=True)
-        print(f"propagate alignment confidence by inference...")
-        kgs.set_iteration(10)
-        kgs.run()
+            # use refined labels to train EA model
+            data, bias = kgs.util.generate_input_for_emb_model()
+            print(f"bias: {bias}")
+            if i == 0:
+                ea_model = EntityAlignmentModel(data)
+            else:
+                train_pair= data[-2]
+                ea_model.reset_data(train_pair)
+            new_pairs = ea_model.train(epoch=20)
+            
+            # feed the inferred pairs into label refiner, for the next iteration
+            kgs.inject_ea_inferred_pairs(new_pairs, bias[0], filter=True, reinject=True)
+            print(f"propagate alignment confidence by inference...")
+            kgs.set_iteration(10)
+            kgs.run()
+
+    # kgs.save_labels(dataset_path+"/pseudo-labels")
 
     # reset the probability of annotated pairs
     kgs.reset_annotation_prob()
@@ -156,15 +170,7 @@ def align(kgs):
     ea_model.fine_tune()
 
 
-
 if __name__ == '__main__':
-
-    print(f"\nExp config:\n {Config()}\n")
-
-    base, _ = os.path.split(os.path.abspath(__file__))
-    dataset_name = args.dataset
-    dataset_path = os.path.join(os.path.join(base, "data"), dataset_name)
-    topk_match_path = os.path.join(dataset_path, f"top{args.topk_match}_match.dict")
 
     print("Construct KGs...")
     kgs = construct_kgs(dataset_dir=dataset_path, name=dataset_name, load_chk=None)
@@ -175,4 +181,5 @@ if __name__ == '__main__':
     
     kgs.set_iteration(20)
 
-    align(kgs=kgs)
+    label_path = dataset_path + "/pseudo-labels" if args.load_chk else None
+    align(kgs=kgs, label_path=label_path)
