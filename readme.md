@@ -1,7 +1,7 @@
 <h1 align="center">
 Official Code of NeurIPS2024 paper
   
-[Entity Alignment with Noisy Annotations from Large Language Models](https://arxiv.org/abs/2405.16806)
+[Entity Alignment with Noisy Annotations from Large Language Models](https://openreview.net/forum?id=qfCQ54ZTX1)
 
 ---
 
@@ -18,6 +18,7 @@ Official Code of NeurIPS2024 paper
 - [Ablations](#Ablations)
 - [Simulations](#Simulations)
 - [Customization](#Customization)
+- [Bibtex](#Bibtex)
 - [Acknowledgement](#acknowledgement)
 - [License](#license)
 
@@ -76,6 +77,21 @@ here, the arguement `--tpr` specifies the true positive rate for the synthesized
 ### Customization
 
 You may customize this framework to your dataset/task by revising the prompts. For instance, some dataset may not contain the entity names and rely on entity attributes to perform alignment, you may customize the `self.messages` and the `self.choose` function in `annotator.py->Annotator`.
+
+
+### Bibtex
+
+Please cite our paper if you use codes in this repo:
+```
+@inproceedings{
+chen2024entity,
+title={Entity Alignment with Noisy Annotations from Large Language Models},
+author={Shengyuan Chen and Qinggang Zhang and Junnan Dong and Wen Hua and Qing Li and Xiao Huang},
+booktitle={The Thirty-eighth Annual Conference on Neural Information Processing Systems},
+year={2024},
+}
+```
+
 
 
 ### Acknowledgement
