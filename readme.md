@@ -81,7 +81,7 @@ You may customize this framework to your dataset/task by revising the prompts. F
 
 ### Bibtex
 
-Please cite our paper if you use codes in this repo:
+If you find this work helpful, please cite our paper:
 ```
 @inproceedings{
 chen2024entity,
