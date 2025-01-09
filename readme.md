@@ -27,7 +27,7 @@ Official Code of NeurIPS2024 paper
 
 ### Environment setup
 
-**Step1.** Instanll the required packages by running the following command:
+**Step1.** Install the required packages by running the following command:
 
 ```
 pip install -r requirements.txt
