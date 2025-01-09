@@ -16,7 +16,7 @@ argparser.add_argument('--query_scheme', type=str, default="aggregated", help="t
 argparser.add_argument('--dataset', type=str, default="EN_DE_15K")
 argparser.add_argument('--iter', type=int, default=1)
 argparser.add_argument('--tpr', type=float, default=0.5)
-argparser.add_argument('--load_chk', type=str, default=True, help="load the previously saved PRASE model, by default None")
+argparser.add_argument('--load_chk', type=str, default=True, help="load the previously annotated pseudo-labels, by default True")
 argparser.add_argument('--simulate', action='store_true', help="simulate the label annotation process, used only in case studies or have no access to llm api, by default False")
 argparser.add_argument('--budget', type=float, default=0.1, help="ratio of the number of inserted pairs to the number of entities in KG1")
 args = argparser.parse_args()
