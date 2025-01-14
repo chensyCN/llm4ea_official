@@ -3,8 +3,8 @@ Official Code of NeurIPS2024 paper
   
 [Entity Alignment with Noisy Annotations from Large Language Models](https://openreview.net/forum?id=qfCQ54ZTX1)
 
----
 
+<h3 align="center">
    <p align="center"><img width="95%" src="llm4ea.png" /></p>
    <p align="center"><em>The framework of LLM4EA.</em></p>
 
@@ -13,12 +13,12 @@ Official Code of NeurIPS2024 paper
 
 ## Table of Content
 
-- [Environment setup](#Environment-setup)
-- [Quick start](#Quick-start)
-- [Ablations](#Ablations)
-- [Simulations](#Simulations)
-- [Customization](#Customization)
-- [Bibtex](#Bibtex)
+- [Environment setup](#environment-setup)
+- [Quick start](#quick-start)
+- [Ablations](#ablations)
+- [Simulations](#simulations)
+- [Customization](#customization)
+- [Bibtex](#bibtex)
 - [Acknowledgement](#acknowledgement)
 - [License](#license)
 
