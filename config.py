@@ -1,4 +1,10 @@
 
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 class Config(object):
     # for data processing
     simplify_url = True
@@ -9,7 +15,7 @@ class Config(object):
 
     # for annotation
     simulate = False
-    gpt_api_key = None # please specify your own GPT API key before running the code
+    gpt_api_key = os.getenv('GPT_API_KEY')
     gpt_model = 'gpt-3.5-turbo'
 
     # for probabilistic inference

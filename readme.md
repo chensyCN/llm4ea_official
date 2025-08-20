@@ -1,5 +1,5 @@
-<h1 align="center">
-Official Code of NeurIPS2024 paper
+<h2 align="center">
+Official Code of NeurIPS'24 paper
   
 [Entity Alignment with Noisy Annotations from Large Language Models](https://openreview.net/forum?id=qfCQ54ZTX1)
 
@@ -19,8 +19,7 @@ Official Code of NeurIPS2024 paper
 - [Simulations](#simulations)
 - [Customization](#customization)
 - [Bibtex](#bibtex)
-- [Acknowledgement](#acknowledgement)
-- [License](#license)
+
 
 
 
@@ -35,7 +34,13 @@ pip install -r requirements.txt
 
 **Step2.** Download the dataset from [here](https://anonymous.4open.science/r/processedOpenEAData-3674/) and put it in the `data` folder.
 
-**Step3.** Specify the `gpt-api-key` in the `config.py` file with your openai API key.
+**Step3.** Set up your OpenAI API key by creating a `.env` file in the project root, with the following content:
+
+```
+GPT_API_KEY=your_actual_openai_api_key_here
+```
+
+**Important:** Never commit your `.env` file to version control as it contains sensitive information.
 
 
 ### Quick start
