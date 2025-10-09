@@ -7,7 +7,7 @@
       <a href="https://openreview.net/forum?id=qfCQ54ZTX1"><img src="https://img.shields.io/badge/paper-available-brightgreen"/></a>
 </div>
 
-LLM4EA is the source code of the paper: [Entity Alignment with Noisy Annotations from Large Language Models](https://openreview.net/forum?id=qfCQ54ZTX1), which has been accepted by **NeurIPS'24**.
+This is the source code of the paper: [Entity Alignment with Noisy Annotations from Large Language Models](https://openreview.net/forum?id=qfCQ54ZTX1), which has been accepted by **NeurIPS'24**.
 
 ![System Architecture](llm4ea.png)
 
