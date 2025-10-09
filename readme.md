@@ -1,30 +1,27 @@
-<h2 align="center">
-Official Code of NeurIPS'24 paper
-  
-[Entity Alignment with Noisy Annotations from Large Language Models](https://openreview.net/forum?id=qfCQ54ZTX1)
+
+# LLM based Entity Alignment
+
+<div align="center">
+    <a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-green.svg"/></a>
+      <a href="http://makeapullrequest.com"><img src="https://img.shields.io/github/last-commit/chensyCN/llm4ea_official?color=blue"/></a>
+      <a href="https://openreview.net/forum?id=qfCQ54ZTX1"><img src="https://img.shields.io/badge/paper-available-brightgreen"/></a>
+</div>
+
+LLM4EA is the source code of the paper: [Entity Alignment with Noisy Annotations from Large Language Models](https://openreview.net/forum?id=qfCQ54ZTX1), which has been accepted by **NeurIPS'24**.
+
+![System Architecture](llm4ea.png)
+
+## 🌟 Key Features
+
+- **Label Refinement**: A probabilistic reasoning module to refine the noisy annotations from LLMs, offering more reliable pseudo-labels.
+- **Active Learning**: A self-paced learning module to select the most informative entities for annotation, ofter than all entities.
+- **Flexible Framework**: A flexible framework to support various black-box LLMs via simple API call, and easily integrated into existing EA algorithms.
 
 
-<h3 align="center">
-   <p align="center"><img width="95%" src="llm4ea.png" /></p>
-   <p align="center"><em>The framework of LLM4EA.</em></p>
+## 📖 Guidelines
 
 
-
-
-## Table of Content
-
-- [Environment setup](#environment-setup)
-- [Quick start](#quick-start)
-- [Ablations](#ablations)
-- [Simulations](#simulations)
-- [Customization](#customization)
-- [Bibtex](#bibtex)
-
-
-
-
-
-### Environment setup
+### 🌱 Environment setup
 
 **Step1.** Install the required packages by running the following command:
 
@@ -43,7 +40,7 @@ GPT_API_KEY=your_actual_openai_api_key_here
 **Important:** Never commit your `.env` file to version control as it contains sensitive information.
 
 
-### Quick start
+### 🚀 Quick start
 
 **LLM4EA**: Run the following command to run llm4ea on D-W-15k dataset
 
@@ -59,7 +56,7 @@ python infer-baseline.py --dataset_name D-W-15K
 
 > Note: to facilatate reproducibility, we provide the annotated pseudo-labels generated during experiments, this `quick start` by default load the saved pseudo-labels. To run the actual experiment, please specify the argment  `--load_chk False` in the command.
 
-### Ablations
+### 🔍 Ablations
 
 There are three optional scripts: `infer-baseline.py`, `infer-active-only.py`, and `infer-lr-only.py`, which are variants of the infer.py script.
 
@@ -68,7 +65,7 @@ There are three optional scripts: `infer-baseline.py`, `infer-active-only.py`, a
 - The `infer-lr-only.py` script deactivates the active learning component of the model. This corresponds to the `w/o Act` ablation setting in the paper.
 
 
-### Simulations
+### 📈 Simulations
 
 If you have no access to an OpenAI API, you can run the simulation by running the following command:
 
@@ -79,12 +76,12 @@ python infer.py --dataset_name D-Y-15K --simulate --tpr 0.5
 here, the arguement `--tpr` specifies the true positive rate for the synthesized pseudo-labels.
 
 
-### Customization
+### 🛠️ Customization
 
 You may customize this framework to your dataset/task by revising the prompts. For instance, some dataset may not contain the entity names and rely on entity attributes to perform alignment, you may customize the `self.messages` and the `self.choose` function in `annotator.py->Annotator`.
 
 
-### Bibtex
+### 📚 Bibtex
 
 If you find this work helpful, please cite our paper:
 ```
@@ -103,6 +100,6 @@ year={2024},
 
 The code is based on [PRASE](https://github.com/qizhyuan/PRASE-Python) and [Dual-AMN](https://github.com/MaoXinn/Dual-AMN), the dataset is from [OpenEA benchmark](https://github.com/nju-websoft/OpenEA), preprocessed by using the dump file `wikidatawiki-20160801-abstract.xml` from [wikdata](https://archive.org/download/wikidatawiki-20160801). The OpenEA dataset is licensed under the GPLv3 License.
 
-### License
+### 📄 License
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE.txt) file for details.
