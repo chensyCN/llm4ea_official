@@ -7,14 +7,14 @@
       <a href="https://openreview.net/forum?id=qfCQ54ZTX1"><img src="https://img.shields.io/badge/paper-available-brightgreen"/></a>
 </div>
 
-This is the source code of the paper: [Entity Alignment with Noisy Annotations from Large Language Models](https://openreview.net/forum?id=qfCQ54ZTX1), which has been accepted by **NeurIPS'24**.
+This is the source code of the **NeurIPS'24** paper: [Entity Alignment with Noisy Annotations from Large Language Models](https://openreview.net/forum?id=qfCQ54ZTX1).
 
-![System Architecture](llm4ea.png)
+![System Architecture](figs/llm4ea.png)
 
 ## 🌟 Key Features
 
 - **Label Refinement**: A probabilistic reasoning module to refine the noisy annotations from LLMs, offering more reliable pseudo-labels.
-- **Active Learning**: A self-paced learning module to select the most informative entities for annotation, ofter than all entities.
+- **Active Learning**: A self-paced learning module to select the most informative entities for annotation.
 - **Flexible Framework**: A flexible framework to support various black-box LLMs via simple API call, and easily integrated into existing EA algorithms.
 
 
