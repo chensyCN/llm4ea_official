@@ -1,4 +1,5 @@
 
+
 # LLM based Entity Alignment
 
 <div align="center">
@@ -58,7 +59,7 @@ python infer-baseline.py --dataset_name D-W-15K
 
 ### 🔍 Ablations
 
-There are three optional scripts: `infer-baseline.py`, `infer-active-only.py`, and `infer-lr-only.py`, which are variants of the infer.py script.
+There are three optional scripts: `infer-baseline.py`, `infer-active-only.py`, and `infer-lr-only.py`, which are variants of the infer.py script. Note that `infer-active-only.py` uses `--dataset` rather than `--dataset_name` to specify the dataset folder name.
 
 - The `infer-baseline.py` script deactivates both the label refinement and active learning components of the framework, directly training the base EA model, Dual-AMN. This corresponds to the Dual-AMN baseline in the main table.
 - The `infer-active-only.py` script deactivates the label refinement component of the model. This corresponds to the `w/o LR` ablation setting in the paper.
